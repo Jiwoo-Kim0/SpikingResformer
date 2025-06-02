@@ -1,4 +1,5 @@
 import os
+import shutil
 import time
 import yaml
 import random
@@ -17,6 +18,7 @@ from torch.utils.tensorboard.writer import SummaryWriter
 from torch.cuda.amp.grad_scaler import GradScaler
 from torch.cuda.amp.autocast_mode import autocast
 import torch.distributed
+from torchvision.transforms import InterpolationMode
 
 import argparse
 from thop import profile
@@ -36,6 +38,7 @@ from timm.optim import create_optimizer_v2
 from timm.scheduler import create_scheduler_v2
 from timm.models import create_model
 
+from tqdm import tqdm
 
 def parse_args():
     config_parser = argparse.ArgumentParser(description="Training Config", add_help=False)
@@ -118,10 +121,10 @@ def init_distributed(logger: logging.Logger, distributed_init_mode):
     if 'RANK' in os.environ and 'WORLD_SIZE' in os.environ:
         rank = int(os.environ["RANK"])
         world_size = int(os.environ['WORLD_SIZE'])
-        local_rank = int(os.environ['LOCAL_RANK'])
+        local_rank = 3
     else:
         logger.info('Not using distributed mode')
-        return False, 0, 1, 0
+        return False, 0, 1, 3
 
     torch.cuda.set_device(local_rank)
     backend = 'nccl'
@@ -141,6 +144,18 @@ def _get_cache_path(filepath):
     cache_path = os.path.expanduser(cache_path)
     return cache_path
 
+src_dir = "./dataset/ASL/val"
+dst_dir = "./dataset/ASL/val_fixed"
+
+os.makedirs(dst_dir, exist_ok=True)
+
+# assuming filename pattern: "A_test.jpg", "B_test.jpg"
+for fname in os.listdir(src_dir):
+    if fname.endswith(".jpg") or fname.endswith(".png"):
+        label = fname.split("_")[0]  # Extract class label from filename
+        class_dir = os.path.join(dst_dir, label)
+        os.makedirs(class_dir, exist_ok=True)
+        shutil.copy(os.path.join(src_dir, fname), os.path.join(class_dir, fname))
 
 def load_data(
     dataset_dir: str,
@@ -156,8 +171,79 @@ def load_data(
     label_smoothing: float,
     T: int,
 ):
+    if dataset_type == 'ASL':
+      transform_train = torchvision.transforms.Compose([
+          torchvision.transforms.Resize((32, 32)),
+          torchvision.transforms.ToTensor(),
+          torchvision.transforms.Normalize(mean=(0.4914, 0.4822, 0.4465), std=(0.2023, 0.1994, 0.2010))
+      ])
+      transform_val = torchvision.transforms.Compose([
+          torchvision.transforms.Resize((32, 32)),
+          torchvision.transforms.ToTensor(),
+          torchvision.transforms.Normalize(mean=(0.4914, 0.4822, 0.4465), std=(0.2023, 0.1994, 0.2010))
+      ])
 
-    if dataset_type == 'CIFAR10':
+      dataset_test = torchvision.datasets.ImageFolder("./dataset/ASL/val_fixed")
+      dataset_train = torchvision.datasets.ImageFolder("./dataset/ASL/train")
+
+      augment_args = dict(
+          scale=[1.0, 1.0],
+          ratio=[1.0, 1.0],
+          hflip=0.5,
+          vflip=0.0,
+      )
+      if augment:
+          augment_args.update(dict(
+              color_jitter=0.0,
+              auto_augment=augment,  
+          ))
+      if cutout:
+          augment_args.update(dict(
+              re_prob=0.25,
+              re_mode='const',
+              re_count=1,
+              re_split=False,
+          ))
+      if mixup:
+          augment_args.update(
+              dict(collate_fn=FastCollateMixup(mixup_alpha=0.5, cutmix_alpha=0.0,
+                                               cutmix_minmax=None, prob=1.0, switch_prob=0.5,
+                                               mode='batch', label_smoothing=label_smoothing,
+                                               num_classes=num_classes)))
+
+      mean = (0.4914, 0.4822, 0.4465)
+      std = (0.2023, 0.1994, 0.2010)
+
+      data_loader_train = create_loader(
+          dataset_train,
+          input_size=input_size,
+          batch_size=batch_size,
+          is_training=True,
+          use_prefetcher=True,
+          interpolation='bicubic',
+          mean=mean,
+          std=std,
+          num_workers=workers,
+          distributed=distributed,
+          pin_memory=True,
+          **augment_args,
+      )
+
+      data_loader_test = create_loader(
+          dataset_test,
+          input_size=input_size,
+          batch_size=batch_size,
+          is_training=False,
+          use_prefetcher=True,
+          interpolation='bicubic',
+          mean=mean,
+          std=std,
+          num_workers=workers,
+          distributed=distributed,
+          crop_pct=1.0,
+          pin_memory=True,
+      )
+    elif dataset_type == 'CIFAR10':
         dataset_train = torchvision.datasets.CIFAR10(root=os.path.join(dataset_dir), train=True,
                                                      download=True)
         dataset_test = torchvision.datasets.CIFAR10(root=os.path.join(dataset_dir), train=False,
@@ -473,6 +559,7 @@ def evaluate(model, criterion, data_loader, print_freq, logger, one_hot=None):
     model.eval()
     metric_dict = RecordDict({'loss': None, 'acc@1': None, 'acc@5': None})
     with torch.no_grad():
+        print("data loader length: ", len(data_loader)) #--------------------------------------------
         for idx, (image, target) in enumerate(data_loader):
             image, target = image.cuda(), target.cuda()
             if one_hot:
@@ -602,7 +689,10 @@ def main():
 
     dataset_type = args.dataset
     one_hot = None
-    if dataset_type == 'CIFAR10':
+    if dataset_type == 'ASL':
+        num_classes = 27
+        input_size = (3, 32, 32)
+    elif dataset_type == 'CIFAR10':
         num_classes = 10
         input_size = (3, 32, 32)
     elif dataset_type == 'CIFAR10DVS':
