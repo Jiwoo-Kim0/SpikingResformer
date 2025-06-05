@@ -144,8 +144,8 @@ def _get_cache_path(filepath):
     cache_path = os.path.expanduser(cache_path)
     return cache_path
 
-src_dir = "./dataset/ASL/val"
-dst_dir = "./dataset/ASL/val_fixed"
+src_dir = "/dev/hdd/bcl_guest/ASL/val"
+dst_dir = "/dev/hdd/bcl_guest/ASL/val_fixed"
 
 os.makedirs(dst_dir, exist_ok=True)
 
@@ -183,8 +183,8 @@ def load_data(
           torchvision.transforms.Normalize(mean=(0.4914, 0.4822, 0.4465), std=(0.2023, 0.1994, 0.2010))
       ])
 
-      dataset_test = torchvision.datasets.ImageFolder("./dataset/ASL/val_fixed")
-      dataset_train = torchvision.datasets.ImageFolder("./dataset/ASL/train")
+      dataset_test = torchvision.datasets.ImageFolder("/dev/hdd/bcl_guest/ASL/val_fixed")
+      dataset_train = torchvision.datasets.ImageFolder("/dev/hdd/bcl_guest/ASL/train")
 
       augment_args = dict(
           scale=[1.0, 1.0],
@@ -542,6 +542,8 @@ def train_one_epoch(
             metric_dict['acc@1'].update(acc1_s, batch_size)
             metric_dict['acc@5'].update(acc5_s, batch_size)
 
+        print_freq = min(print_freq, len(data_loader_train))
+
         if print_freq != 0 and ((idx + 1) % int(len(data_loader_train) / (print_freq))) == 0:
             #torch.distributed.barrier()
             metric_dict.sync()
@@ -559,7 +561,6 @@ def evaluate(model, criterion, data_loader, print_freq, logger, one_hot=None):
     model.eval()
     metric_dict = RecordDict({'loss': None, 'acc@1': None, 'acc@5': None})
     with torch.no_grad():
-        print("data loader length: ", len(data_loader)) #--------------------------------------------
         for idx, (image, target) in enumerate(data_loader):
             image, target = image.cuda(), target.cuda()
             if one_hot:
@@ -578,6 +579,7 @@ def evaluate(model, criterion, data_loader, print_freq, logger, one_hot=None):
             metric_dict['acc@1'].update(acc1.item(), batch_size)
             metric_dict['acc@5'].update(acc5.item(), batch_size)
 
+            print_freq = min(print_freq, len(data_loader))
             if print_freq != 0 and ((idx + 1) % int(len(data_loader) / print_freq)) == 0:
                 #torch.distributed.barrier()
                 metric_dict.sync()
@@ -615,6 +617,8 @@ def test(
             batch_size = image.shape[0]
             metric_dict['acc@1'].update(acc1.item(), batch_size)
             metric_dict['acc@5'].update(acc5.item(), batch_size)
+
+            args.print_freq = min(args.print_freq, len(data_loader_test))
 
             if args.print_freq != 0 and ((idx + 1) %
                                          int(len(data_loader_test) / args.print_freq)) == 0:
@@ -891,7 +895,7 @@ def main():
         T=args.T,
         num_classes=num_classes,
         img_size=input_size[-1],
-    )
+    ).cuda()
 
     try:
         checkpoint = torch.load(os.path.join(args.output_dir, 'checkpoint_max_acc1.pth'),

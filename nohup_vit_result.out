@@ -1,0 +1,639 @@
+nohup: ignoring input
+2025. 06. 03. (화) 15:25:16 KST
+=== Command: CMD=asl.yaml OUTPUT=asl_asl_vit.txt
+/dev/hdd/bcl_guest/anaconda3/lib/python3.11/site-packages/timm/models/registry.py:4: FutureWarning: Importing from timm.models.registry is deprecated, please import via timm.models
+  warnings.warn(f"Importing from {__name__} is deprecated, please import via timm.models", FutureWarning)
+[2025-06-03 15:25:20][INFO]Not using distributed mode
+[2025-06-03 15:25:20][INFO]Namespace(seed=12450, epochs=20, batch_size=16, T=4, model='spikingresformer_cifar', dataset='ASL', augment='rand-m7-n1-mstd0.5-inc1', mixup=True, cutout=False, label_smoothing=0.1, workers=16, lr=0.0005, optimizer='adamw', weight_decay=0.01, print_freq=5, data_path='/dev/hdd/bcl_guest/ASL', output_dir='/dev/hdd/bcl_guest/output', resume=None, transfer=None, input_size=[3, 32, 32], distributed_init_mode='env://', TET=False, TET_phi=1.0, TET_lambda=0.0, save_latest=False, test_only=False, amp=True, sync_bn=False, num_classes=27)
+[2025-06-03 15:25:20][INFO]dataset_train: 81000, dataset_test: 27
+/home/bcl_guest/SpikingResformer/main.py:765: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  scaler = GradScaler()
+[2025-06-03 15:25:21][DEBUG]SpikingResformer(
+  (prologue): Sequential(
+    (0): Conv2d(3, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False, step_mode=m)
+    (1): BN(
+      (bn): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+  )
+  (layers): Sequential(
+    (0): Sequential(
+      (0): DSSA(
+        (activation_in): LIF(
+          v_threshold=1.0, v_reset=0.0, detach_reset=True, step_mode=m, backend=cupy, tau=2.0
+          (surrogate_function): ATan(alpha=2.0, spiking=True)
+        )
+        (W): Conv2d(64, 128, kernel_size=(4, 4), stride=(4, 4), bias=False, step_mode=m)
+        (norm): BN(
+          (bn): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (matmul1): SpikingMatmul()
+        (matmul2): SpikingMatmul()
+        (activation_attn): LIF(
+          v_threshold=1.0, v_reset=0.0, detach_reset=True, step_mode=m, backend=cupy, tau=2.0
+          (surrogate_function): ATan(alpha=2.0, spiking=True)
+        )
+        (activation_out): LIF(
+          v_threshold=1.0, v_reset=0.0, detach_reset=True, step_mode=m, backend=cupy, tau=2.0
+          (surrogate_function): ATan(alpha=2.0, spiking=True)
+        )
+        (Wproj): Conv1x1(64, 64, kernel_size=(1, 1), stride=(1, 1), bias=False, step_mode=m)
+        (norm_proj): BN(
+          (bn): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (1): GWFFN(
+        (up): Sequential(
+          (0): LIF(
+            v_threshold=1.0, v_reset=0.0, detach_reset=True, step_mode=m, backend=cupy, tau=2.0
+            (surrogate_function): ATan(alpha=2.0, spiking=True)
+          )
+          (1): Conv1x1(64, 256, kernel_size=(1, 1), stride=(1, 1), bias=False, step_mode=m)
+          (2): BN(
+            (bn): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          )
+        )
+        (conv): ModuleList(
+          (0): Sequential(
+            (0): LIF(
+              v_threshold=1.0, v_reset=0.0, detach_reset=True, step_mode=m, backend=cupy, tau=2.0
+              (surrogate_function): ATan(alpha=2.0, spiking=True)
+            )
+            (1): Conv3x3(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=4, bias=False, step_mode=m)
+            (2): BN(
+              (bn): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            )
+          )
+        )
+        (down): Sequential(
+          (0): LIF(
+            v_threshold=1.0, v_reset=0.0, detach_reset=True, step_mode=m, backend=cupy, tau=2.0
+            (surrogate_function): ATan(alpha=2.0, spiking=True)
+          )
+          (1): Conv1x1(256, 64, kernel_size=(1, 1), stride=(1, 1), bias=False, step_mode=m)
+          (2): BN(
+            (bn): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          )
+        )
+      )
+    )
+    (1): Sequential(
+      (0): DownsampleLayer(
+        (conv): Conv3x3(64, 192, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False, step_mode=m)
+        (norm): BN(
+          (bn): BatchNorm2d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (activation): LIF(
+          v_threshold=1.0, v_reset=0.0, detach_reset=True, step_mode=m, backend=cupy, tau=2.0
+          (surrogate_function): ATan(alpha=2.0, spiking=True)
+        )
+      )
+      (1): DSSA(
+        (activation_in): LIF(
+          v_threshold=1.0, v_reset=0.0, detach_reset=True, step_mode=m, backend=cupy, tau=2.0
+          (surrogate_function): ATan(alpha=2.0, spiking=True)
+        )
+        (W): Conv2d(192, 384, kernel_size=(2, 2), stride=(2, 2), bias=False, step_mode=m)
+        (norm): BN(
+          (bn): BatchNorm2d(384, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (matmul1): SpikingMatmul()
+        (matmul2): SpikingMatmul()
+        (activation_attn): LIF(
+          v_threshold=1.0, v_reset=0.0, detach_reset=True, step_mode=m, backend=cupy, tau=2.0
+          (surrogate_function): ATan(alpha=2.0, spiking=True)
+        )
+        (activation_out): LIF(
+          v_threshold=1.0, v_reset=0.0, detach_reset=True, step_mode=m, backend=cupy, tau=2.0
+          (surrogate_function): ATan(alpha=2.0, spiking=True)
+        )
+        (Wproj): Conv1x1(192, 192, kernel_size=(1, 1), stride=(1, 1), bias=False, step_mode=m)
+        (norm_proj): BN(
+          (bn): BatchNorm2d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (2): GWFFN(
+        (up): Sequential(
+          (0): LIF(
+            v_threshold=1.0, v_reset=0.0, detach_reset=True, step_mode=m, backend=cupy, tau=2.0
+            (surrogate_function): ATan(alpha=2.0, spiking=True)
+          )
+          (1): Conv1x1(192, 768, kernel_size=(1, 1), stride=(1, 1), bias=False, step_mode=m)
+          (2): BN(
+            (bn): BatchNorm2d(768, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          )
+        )
+        (conv): ModuleList(
+          (0): Sequential(
+            (0): LIF(
+              v_threshold=1.0, v_reset=0.0, detach_reset=True, step_mode=m, backend=cupy, tau=2.0
+              (surrogate_function): ATan(alpha=2.0, spiking=True)
+            )
+            (1): Conv3x3(768, 768, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=12, bias=False, step_mode=m)
+            (2): BN(
+              (bn): BatchNorm2d(768, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            )
+          )
+        )
+        (down): Sequential(
+          (0): LIF(
+            v_threshold=1.0, v_reset=0.0, detach_reset=True, step_mode=m, backend=cupy, tau=2.0
+            (surrogate_function): ATan(alpha=2.0, spiking=True)
+          )
+          (1): Conv1x1(768, 192, kernel_size=(1, 1), stride=(1, 1), bias=False, step_mode=m)
+          (2): BN(
+            (bn): BatchNorm2d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          )
+        )
+      )
+      (3): DSSA(
+        (activation_in): LIF(
+          v_threshold=1.0, v_reset=0.0, detach_reset=True, step_mode=m, backend=cupy, tau=2.0
+          (surrogate_function): ATan(alpha=2.0, spiking=True)
+        )
+        (W): Conv2d(192, 384, kernel_size=(2, 2), stride=(2, 2), bias=False, step_mode=m)
+        (norm): BN(
+          (bn): BatchNorm2d(384, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (matmul1): SpikingMatmul()
+        (matmul2): SpikingMatmul()
+        (activation_attn): LIF(
+          v_threshold=1.0, v_reset=0.0, detach_reset=True, step_mode=m, backend=cupy, tau=2.0
+          (surrogate_function): ATan(alpha=2.0, spiking=True)
+        )
+        (activation_out): LIF(
+          v_threshold=1.0, v_reset=0.0, detach_reset=True, step_mode=m, backend=cupy, tau=2.0
+          (surrogate_function): ATan(alpha=2.0, spiking=True)
+        )
+        (Wproj): Conv1x1(192, 192, kernel_size=(1, 1), stride=(1, 1), bias=False, step_mode=m)
+        (norm_proj): BN(
+          (bn): BatchNorm2d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (4): GWFFN(
+        (up): Sequential(
+          (0): LIF(
+            v_threshold=1.0, v_reset=0.0, detach_reset=True, step_mode=m, backend=cupy, tau=2.0
+            (surrogate_function): ATan(alpha=2.0, spiking=True)
+          )
+          (1): Conv1x1(192, 768, kernel_size=(1, 1), stride=(1, 1), bias=False, step_mode=m)
+          (2): BN(
+            (bn): BatchNorm2d(768, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          )
+        )
+        (conv): ModuleList(
+          (0): Sequential(
+            (0): LIF(
+              v_threshold=1.0, v_reset=0.0, detach_reset=True, step_mode=m, backend=cupy, tau=2.0
+              (surrogate_function): ATan(alpha=2.0, spiking=True)
+            )
+            (1): Conv3x3(768, 768, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=12, bias=False, step_mode=m)
+            (2): BN(
+              (bn): BatchNorm2d(768, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            )
+          )
+        )
+        (down): Sequential(
+          (0): LIF(
+            v_threshold=1.0, v_reset=0.0, detach_reset=True, step_mode=m, backend=cupy, tau=2.0
+            (surrogate_function): ATan(alpha=2.0, spiking=True)
+          )
+          (1): Conv1x1(768, 192, kernel_size=(1, 1), stride=(1, 1), bias=False, step_mode=m)
+          (2): BN(
+            (bn): BatchNorm2d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          )
+        )
+      )
+    )
+    (2): Sequential(
+      (0): DownsampleLayer(
+        (conv): Conv3x3(192, 384, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False, step_mode=m)
+        (norm): BN(
+          (bn): BatchNorm2d(384, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (activation): LIF(
+          v_threshold=1.0, v_reset=0.0, detach_reset=True, step_mode=m, backend=cupy, tau=2.0
+          (surrogate_function): ATan(alpha=2.0, spiking=True)
+        )
+      )
+      (1): DSSA(
+        (activation_in): LIF(
+          v_threshold=1.0, v_reset=0.0, detach_reset=True, step_mode=m, backend=cupy, tau=2.0
+          (surrogate_function): ATan(alpha=2.0, spiking=True)
+        )
+        (W): Conv2d(384, 768, kernel_size=(1, 1), stride=(1, 1), bias=False, step_mode=m)
+        (norm): BN(
+          (bn): BatchNorm2d(768, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (matmul1): SpikingMatmul()
+        (matmul2): SpikingMatmul()
+        (activation_attn): LIF(
+          v_threshold=1.0, v_reset=0.0, detach_reset=True, step_mode=m, backend=cupy, tau=2.0
+          (surrogate_function): ATan(alpha=2.0, spiking=True)
+        )
+        (activation_out): LIF(
+          v_threshold=1.0, v_reset=0.0, detach_reset=True, step_mode=m, backend=cupy, tau=2.0
+          (surrogate_function): ATan(alpha=2.0, spiking=True)
+        )
+        (Wproj): Conv1x1(384, 384, kernel_size=(1, 1), stride=(1, 1), bias=False, step_mode=m)
+        (norm_proj): BN(
+          (bn): BatchNorm2d(384, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (2): GWFFN(
+        (up): Sequential(
+          (0): LIF(
+            v_threshold=1.0, v_reset=0.0, detach_reset=True, step_mode=m, backend=cupy, tau=2.0
+            (surrogate_function): ATan(alpha=2.0, spiking=True)
+          )
+          (1): Conv1x1(384, 1536, kernel_size=(1, 1), stride=(1, 1), bias=False, step_mode=m)
+          (2): BN(
+            (bn): BatchNorm2d(1536, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          )
+        )
+        (conv): ModuleList(
+          (0): Sequential(
+            (0): LIF(
+              v_threshold=1.0, v_reset=0.0, detach_reset=True, step_mode=m, backend=cupy, tau=2.0
+              (surrogate_function): ATan(alpha=2.0, spiking=True)
+            )
+            (1): Conv3x3(1536, 1536, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=24, bias=False, step_mode=m)
+            (2): BN(
+              (bn): BatchNorm2d(1536, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            )
+          )
+        )
+        (down): Sequential(
+          (0): LIF(
+            v_threshold=1.0, v_reset=0.0, detach_reset=True, step_mode=m, backend=cupy, tau=2.0
+            (surrogate_function): ATan(alpha=2.0, spiking=True)
+          )
+          (1): Conv1x1(1536, 384, kernel_size=(1, 1), stride=(1, 1), bias=False, step_mode=m)
+          (2): BN(
+            (bn): BatchNorm2d(384, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          )
+        )
+      )
+      (3): DSSA(
+        (activation_in): LIF(
+          v_threshold=1.0, v_reset=0.0, detach_reset=True, step_mode=m, backend=cupy, tau=2.0
+          (surrogate_function): ATan(alpha=2.0, spiking=True)
+        )
+        (W): Conv2d(384, 768, kernel_size=(1, 1), stride=(1, 1), bias=False, step_mode=m)
+        (norm): BN(
+          (bn): BatchNorm2d(768, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (matmul1): SpikingMatmul()
+        (matmul2): SpikingMatmul()
+        (activation_attn): LIF(
+          v_threshold=1.0, v_reset=0.0, detach_reset=True, step_mode=m, backend=cupy, tau=2.0
+          (surrogate_function): ATan(alpha=2.0, spiking=True)
+        )
+        (activation_out): LIF(
+          v_threshold=1.0, v_reset=0.0, detach_reset=True, step_mode=m, backend=cupy, tau=2.0
+          (surrogate_function): ATan(alpha=2.0, spiking=True)
+        )
+        (Wproj): Conv1x1(384, 384, kernel_size=(1, 1), stride=(1, 1), bias=False, step_mode=m)
+        (norm_proj): BN(
+          (bn): BatchNorm2d(384, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (4): GWFFN(
+        (up): Sequential(
+          (0): LIF(
+            v_threshold=1.0, v_reset=0.0, detach_reset=True, step_mode=m, backend=cupy, tau=2.0
+            (surrogate_function): ATan(alpha=2.0, spiking=True)
+          )
+          (1): Conv1x1(384, 1536, kernel_size=(1, 1), stride=(1, 1), bias=False, step_mode=m)
+          (2): BN(
+            (bn): BatchNorm2d(1536, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          )
+        )
+        (conv): ModuleList(
+          (0): Sequential(
+            (0): LIF(
+              v_threshold=1.0, v_reset=0.0, detach_reset=True, step_mode=m, backend=cupy, tau=2.0
+              (surrogate_function): ATan(alpha=2.0, spiking=True)
+            )
+            (1): Conv3x3(1536, 1536, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=24, bias=False, step_mode=m)
+            (2): BN(
+              (bn): BatchNorm2d(1536, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            )
+          )
+        )
+        (down): Sequential(
+          (0): LIF(
+            v_threshold=1.0, v_reset=0.0, detach_reset=True, step_mode=m, backend=cupy, tau=2.0
+            (surrogate_function): ATan(alpha=2.0, spiking=True)
+          )
+          (1): Conv1x1(1536, 384, kernel_size=(1, 1), stride=(1, 1), bias=False, step_mode=m)
+          (2): BN(
+            (bn): BatchNorm2d(384, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          )
+        )
+      )
+      (5): DSSA(
+        (activation_in): LIF(
+          v_threshold=1.0, v_reset=0.0, detach_reset=True, step_mode=m, backend=cupy, tau=2.0
+          (surrogate_function): ATan(alpha=2.0, spiking=True)
+        )
+        (W): Conv2d(384, 768, kernel_size=(1, 1), stride=(1, 1), bias=False, step_mode=m)
+        (norm): BN(
+          (bn): BatchNorm2d(768, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (matmul1): SpikingMatmul()
+        (matmul2): SpikingMatmul()
+        (activation_attn): LIF(
+          v_threshold=1.0, v_reset=0.0, detach_reset=True, step_mode=m, backend=cupy, tau=2.0
+          (surrogate_function): ATan(alpha=2.0, spiking=True)
+        )
+        (activation_out): LIF(
+          v_threshold=1.0, v_reset=0.0, detach_reset=True, step_mode=m, backend=cupy, tau=2.0
+          (surrogate_function): ATan(alpha=2.0, spiking=True)
+        )
+        (Wproj): Conv1x1(384, 384, kernel_size=(1, 1), stride=(1, 1), bias=False, step_mode=m)
+        (norm_proj): BN(
+          (bn): BatchNorm2d(384, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (6): GWFFN(
+        (up): Sequential(
+          (0): LIF(
+            v_threshold=1.0, v_reset=0.0, detach_reset=True, step_mode=m, backend=cupy, tau=2.0
+            (surrogate_function): ATan(alpha=2.0, spiking=True)
+          )
+          (1): Conv1x1(384, 1536, kernel_size=(1, 1), stride=(1, 1), bias=False, step_mode=m)
+          (2): BN(
+            (bn): BatchNorm2d(1536, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          )
+        )
+        (conv): ModuleList(
+          (0): Sequential(
+            (0): LIF(
+              v_threshold=1.0, v_reset=0.0, detach_reset=True, step_mode=m, backend=cupy, tau=2.0
+              (surrogate_function): ATan(alpha=2.0, spiking=True)
+            )
+            (1): Conv3x3(1536, 1536, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=24, bias=False, step_mode=m)
+            (2): BN(
+              (bn): BatchNorm2d(1536, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            )
+          )
+        )
+        (down): Sequential(
+          (0): LIF(
+            v_threshold=1.0, v_reset=0.0, detach_reset=True, step_mode=m, backend=cupy, tau=2.0
+            (surrogate_function): ATan(alpha=2.0, spiking=True)
+          )
+          (1): Conv1x1(1536, 384, kernel_size=(1, 1), stride=(1, 1), bias=False, step_mode=m)
+          (2): BN(
+            (bn): BatchNorm2d(384, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          )
+        )
+      )
+    )
+  )
+  (avgpool): AdaptiveAvgPool2d(output_size=(1, 1), step_mode=m)
+  (classifier): Linear(in_features=384, out_features=27, bias=False)
+)
+[2025-06-03 15:25:21][INFO][Train]
+[2025-06-03 15:25:21][INFO]Epoch [0] Start, lr 0.000010
+/home/bcl_guest/SpikingResformer/main.py:511: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast():
+[2025-06-03 15:26:45][DEBUG] [1012/5062] it/s: 193.44540, loss: 3.25021, acc@1: 7.62105, acc@5: 28.92787
+[2025-06-03 15:28:06][DEBUG] [2024/5062] it/s: 198.09231, loss: 3.19247, acc@1: 9.96480, acc@5: 34.14958
+[2025-06-03 15:29:29][DEBUG] [3036/5062] it/s: 197.68595, loss: 3.13400, acc@1: 12.22208, acc@5: 38.85252
+[2025-06-03 15:30:53][DEBUG] [4048/5062] it/s: 196.39718, loss: 3.08108, acc@1: 14.28638, acc@5: 42.73715
+[2025-06-03 15:32:14][DEBUG] [5060/5062] it/s: 197.29154, loss: 3.03046, acc@1: 16.33399, acc@5: 45.97703
+[2025-06-03 15:32:15][DEBUG] Train spent: 0:06:54.
+[2025-06-03 15:32:17][DEBUG] [1/2] loss: 1.09226, acc@1: 50.00000, acc@5: 100.00000
+[2025-06-03 15:32:17][DEBUG] [2/2] loss: 1.36984, acc@1: 55.55556, acc@5: 96.29630
+[2025-06-03 15:32:17][DEBUG] Test spent: 0:00:02.
+[2025-06-03 15:32:17][INFO] Test loss: 1.36984, Acc@1: 55.55556, Acc@5: 96.29630
+[2025-06-03 15:32:17][INFO]Epoch [1] Start, lr 0.000173
+[2025-06-03 15:33:38][DEBUG] [1012/5062] it/s: 203.15003, loss: 2.81045, acc@1: 25.55583, acc@5: 61.11660
+[2025-06-03 15:34:59][DEBUG] [2024/5062] it/s: 202.49777, loss: 2.62086, acc@1: 34.52322, acc@5: 69.16070
+[2025-06-03 15:36:19][DEBUG] [3036/5062] it/s: 202.45791, loss: 2.47567, acc@1: 41.70166, acc@5: 74.24037
+[2025-06-03 15:37:40][DEBUG] [4048/5062] it/s: 202.45760, loss: 2.35602, acc@1: 47.56361, acc@5: 77.80849
+[2025-06-03 15:39:00][DEBUG] [5060/5062] it/s: 202.44352, loss: 2.25819, acc@1: 52.26285, acc@5: 80.36191
+[2025-06-03 15:39:00][DEBUG] Train spent: 0:06:43.
+[2025-06-03 15:39:01][DEBUG] [1/2] loss: 0.26962, acc@1: 100.00000, acc@5: 100.00000
+[2025-06-03 15:39:01][DEBUG] [2/2] loss: 0.33443, acc@1: 100.00000, acc@5: 100.00000
+[2025-06-03 15:39:01][DEBUG] Test spent: 0:00:00.
+[2025-06-03 15:39:01][INFO] Test loss: 0.33443, Acc@1: 100.00000, Acc@5: 100.00000
+[2025-06-03 15:39:01][INFO]Epoch [2] Start, lr 0.000337
+[2025-06-03 15:40:24][DEBUG] [1012/5062] it/s: 197.63780, loss: 1.92464, acc@1: 69.20084, acc@5: 89.80978
+[2025-06-03 15:41:44][DEBUG] [2024/5062] it/s: 200.80731, loss: 1.86591, acc@1: 71.81324, acc@5: 90.95850
+[2025-06-03 15:43:05][DEBUG] [3036/5062] it/s: 200.52578, loss: 1.82833, acc@1: 73.47867, acc@5: 91.63785
+[2025-06-03 15:44:28][DEBUG] [4048/5062] it/s: 200.04371, loss: 1.79646, acc@1: 74.83171, acc@5: 92.20757
+[2025-06-03 15:45:49][DEBUG] [5060/5062] it/s: 200.08356, loss: 1.76107, acc@1: 76.19195, acc@5: 92.70998
+[2025-06-03 15:45:49][DEBUG] Train spent: 0:06:47.
+[2025-06-03 15:45:49][DEBUG] [1/2] loss: 0.21120, acc@1: 100.00000, acc@5: 100.00000
+[2025-06-03 15:45:49][DEBUG] [2/2] loss: 0.20424, acc@1: 100.00000, acc@5: 100.00000
+[2025-06-03 15:45:49][DEBUG] Test spent: 0:00:00.
+[2025-06-03 15:45:49][INFO] Test loss: 0.20424, Acc@1: 100.00000, Acc@5: 100.00000
+[2025-06-03 15:45:49][INFO]Epoch [3] Start, lr 0.000473
+[2025-06-03 15:47:12][DEBUG] [1012/5062] it/s: 198.67524, loss: 1.67916, acc@1: 80.40390, acc@5: 94.29348
+[2025-06-03 15:48:33][DEBUG] [2024/5062] it/s: 199.79299, loss: 1.65090, acc@1: 81.05546, acc@5: 94.55595
+[2025-06-03 15:49:56][DEBUG] [3036/5062] it/s: 198.17439, loss: 1.62377, acc@1: 81.82230, acc@5: 95.01812
+[2025-06-03 15:51:19][DEBUG] [4048/5062] it/s: 197.75319, loss: 1.60661, acc@1: 82.26748, acc@5: 95.25229
+[2025-06-03 15:52:41][DEBUG] [5060/5062] it/s: 198.27663, loss: 1.58465, acc@1: 82.90143, acc@5: 95.51877
+[2025-06-03 15:52:41][DEBUG] Train spent: 0:06:51.
+[2025-06-03 15:52:41][DEBUG] [1/2] loss: 0.20892, acc@1: 100.00000, acc@5: 100.00000
+[2025-06-03 15:52:41][DEBUG] [2/2] loss: 0.18711, acc@1: 100.00000, acc@5: 100.00000
+[2025-06-03 15:52:41][DEBUG] Test spent: 0:00:00.
+[2025-06-03 15:52:41][INFO] Test loss: 0.18711, Acc@1: 100.00000, Acc@5: 100.00000
+[2025-06-03 15:52:41][INFO]Epoch [4] Start, lr 0.000453
+[2025-06-03 15:54:02][DEBUG] [1012/5062] it/s: 200.58894, loss: 1.50936, acc@1: 85.09140, acc@5: 96.73913
+[2025-06-03 15:55:26][DEBUG] [2024/5062] it/s: 197.77003, loss: 1.50215, acc@1: 85.37858, acc@5: 96.78854
+[2025-06-03 15:56:49][DEBUG] [3036/5062] it/s: 197.10735, loss: 1.48247, acc@1: 85.86751, acc@5: 96.86059
+[2025-06-03 15:58:13][DEBUG] [4048/5062] it/s: 196.64355, loss: 1.47551, acc@1: 86.06256, acc@5: 96.98153
+[2025-06-03 15:59:34][DEBUG] [5060/5062] it/s: 197.20784, loss: 1.46683, acc@1: 86.21912, acc@5: 97.07510
+[2025-06-03 15:59:35][DEBUG] Train spent: 0:06:53.
+[2025-06-03 15:59:35][DEBUG] [1/2] loss: 0.26814, acc@1: 100.00000, acc@5: 100.00000
+[2025-06-03 15:59:35][DEBUG] [2/2] loss: 0.25516, acc@1: 100.00000, acc@5: 100.00000
+[2025-06-03 15:59:35][DEBUG] Test spent: 0:00:00.
+[2025-06-03 15:59:35][INFO] Test loss: 0.25516, Acc@1: 100.00000, Acc@5: 100.00000
+[2025-06-03 15:59:35][INFO]Epoch [5] Start, lr 0.000428
+[2025-06-03 16:00:57][DEBUG] [1012/5062] it/s: 198.81941, loss: 1.39879, acc@1: 86.99975, acc@5: 97.64081
+[2025-06-03 16:02:22][DEBUG] [2024/5062] it/s: 194.55382, loss: 1.38692, acc@1: 87.55867, acc@5: 97.78903
+[2025-06-03 16:03:45][DEBUG] [3036/5062] it/s: 195.05081, loss: 1.39038, acc@1: 87.33119, acc@5: 97.76227
+[2025-06-03 16:05:09][DEBUG] [4048/5062] it/s: 195.08017, loss: 1.39102, acc@1: 87.47530, acc@5: 97.84307
+[2025-06-03 16:06:34][DEBUG] [5060/5062] it/s: 194.40085, loss: 1.38878, acc@1: 87.49506, acc@5: 97.85203
+[2025-06-03 16:06:34][DEBUG] Train spent: 0:06:59.
+[2025-06-03 16:06:34][DEBUG] [1/2] loss: 0.19318, acc@1: 100.00000, acc@5: 100.00000
+[2025-06-03 16:06:34][DEBUG] [2/2] loss: 0.17165, acc@1: 100.00000, acc@5: 100.00000
+[2025-06-03 16:06:34][DEBUG] Test spent: 0:00:00.
+[2025-06-03 16:06:34][INFO] Test loss: 0.17165, Acc@1: 100.00000, Acc@5: 100.00000
+[2025-06-03 16:06:34][INFO]Epoch [6] Start, lr 0.000399
+[2025-06-03 16:07:56][DEBUG] [1012/5062] it/s: 198.54875, loss: 1.33550, acc@1: 88.77223, acc@5: 98.35721
+[2025-06-03 16:09:20][DEBUG] [2024/5062] it/s: 197.36562, loss: 1.34188, acc@1: 88.26272, acc@5: 98.21208
+[2025-06-03 16:10:42][DEBUG] [3036/5062] it/s: 197.39799, loss: 1.34567, acc@1: 88.06818, acc@5: 98.16782
+[2025-06-03 16:12:05][DEBUG] [4048/5062] it/s: 197.39508, loss: 1.33889, acc@1: 88.09443, acc@5: 98.23370
+[2025-06-03 16:13:26][DEBUG] [5060/5062] it/s: 198.04617, loss: 1.33371, acc@1: 88.18552, acc@5: 98.26705
+[2025-06-03 16:13:26][DEBUG] Train spent: 0:06:52.
+[2025-06-03 16:13:26][DEBUG] [1/2] loss: 0.22993, acc@1: 100.00000, acc@5: 100.00000
+[2025-06-03 16:13:26][DEBUG] [2/2] loss: 0.22669, acc@1: 100.00000, acc@5: 100.00000
+[2025-06-03 16:13:26][DEBUG] Test spent: 0:00:00.
+[2025-06-03 16:13:26][INFO] Test loss: 0.22669, Acc@1: 100.00000, Acc@5: 100.00000
+[2025-06-03 16:13:26][INFO]Epoch [7] Start, lr 0.000366
+[2025-06-03 16:14:45][DEBUG] [1012/5062] it/s: 207.05636, loss: 1.30882, acc@1: 88.48814, acc@5: 98.49308
+[2025-06-03 16:16:08][DEBUG] [2024/5062] it/s: 202.48847, loss: 1.28989, acc@1: 88.95442, acc@5: 98.53940
+[2025-06-03 16:17:27][DEBUG] [3036/5062] it/s: 203.00475, loss: 1.29317, acc@1: 88.88752, acc@5: 98.55690
+[2025-06-03 16:18:44][DEBUG] [4048/5062] it/s: 205.32788, loss: 1.29293, acc@1: 88.84480, acc@5: 98.57646
+[2025-06-03 16:20:06][DEBUG] [5060/5062] it/s: 204.07081, loss: 1.29425, acc@1: 88.81299, acc@5: 98.59190
+[2025-06-03 16:20:06][DEBUG] Train spent: 0:06:39.
+[2025-06-03 16:20:06][DEBUG] [1/2] loss: 0.22497, acc@1: 100.00000, acc@5: 100.00000
+[2025-06-03 16:20:06][DEBUG] [2/2] loss: 0.20569, acc@1: 100.00000, acc@5: 100.00000
+[2025-06-03 16:20:06][DEBUG] Test spent: 0:00:00.
+[2025-06-03 16:20:06][INFO] Test loss: 0.20569, Acc@1: 100.00000, Acc@5: 100.00000
+[2025-06-03 16:20:06][INFO]Epoch [8] Start, lr 0.000331
+[2025-06-03 16:21:29][DEBUG] [1012/5062] it/s: 198.29323, loss: 1.26870, acc@1: 89.24778, acc@5: 98.67218
+[2025-06-03 16:22:49][DEBUG] [2024/5062] it/s: 199.98706, loss: 1.26459, acc@1: 89.16131, acc@5: 98.72159
+[2025-06-03 16:24:10][DEBUG] [3036/5062] it/s: 200.70131, loss: 1.26192, acc@1: 89.26630, acc@5: 98.78541
+[2025-06-03 16:25:32][DEBUG] [4048/5062] it/s: 200.28085, loss: 1.26471, acc@1: 89.11654, acc@5: 98.79416
+[2025-06-03 16:26:54][DEBUG] [5060/5062] it/s: 200.13687, loss: 1.26710, acc@1: 89.00445, acc@5: 98.78335
+[2025-06-03 16:26:54][DEBUG] Train spent: 0:06:47.
+[2025-06-03 16:26:54][DEBUG] [1/2] loss: 0.25573, acc@1: 100.00000, acc@5: 100.00000
+[2025-06-03 16:26:54][DEBUG] [2/2] loss: 0.23132, acc@1: 100.00000, acc@5: 100.00000
+[2025-06-03 16:26:54][DEBUG] Test spent: 0:00:00.
+[2025-06-03 16:26:54][INFO] Test loss: 0.23132, Acc@1: 100.00000, Acc@5: 100.00000
+[2025-06-03 16:26:54][INFO]Epoch [9] Start, lr 0.000293
+[2025-06-03 16:28:15][DEBUG] [1012/5062] it/s: 202.35929, loss: 1.26695, acc@1: 88.98221, acc@5: 98.96245
+[2025-06-03 16:29:35][DEBUG] [2024/5062] it/s: 202.41180, loss: 1.26517, acc@1: 89.01618, acc@5: 98.96554
+[2025-06-03 16:30:55][DEBUG] [3036/5062] it/s: 203.36774, loss: 1.25147, acc@1: 89.30336, acc@5: 99.00568
+[2025-06-03 16:32:18][DEBUG] [4048/5062] it/s: 201.65360, loss: 1.25274, acc@1: 89.09338, acc@5: 98.97480
+[2025-06-03 16:33:39][DEBUG] [5060/5062] it/s: 201.25366, loss: 1.24930, acc@1: 89.15267, acc@5: 98.98345
+[2025-06-03 16:33:40][DEBUG] Train spent: 0:06:45.
+[2025-06-03 16:33:40][DEBUG] [1/2] loss: 0.36010, acc@1: 100.00000, acc@5: 100.00000
+[2025-06-03 16:33:40][DEBUG] [2/2] loss: 0.33133, acc@1: 100.00000, acc@5: 100.00000
+[2025-06-03 16:33:40][DEBUG] Test spent: 0:00:00.
+[2025-06-03 16:33:40][INFO] Test loss: 0.33133, Acc@1: 100.00000, Acc@5: 100.00000
+[2025-06-03 16:33:40][INFO]Epoch [10] Start, lr 0.000255
+[2025-06-03 16:35:00][DEBUG] [1012/5062] it/s: 202.14546, loss: 1.23201, acc@1: 89.63068, acc@5: 99.18478
+[2025-06-03 16:36:18][DEBUG] [2024/5062] it/s: 206.62601, loss: 1.22703, acc@1: 89.35894, acc@5: 99.19713
+[2025-06-03 16:37:40][DEBUG] [3036/5062] it/s: 203.78263, loss: 1.22444, acc@1: 89.51128, acc@5: 99.17655
+[2025-06-03 16:39:02][DEBUG] [4048/5062] it/s: 202.10806, loss: 1.22186, acc@1: 89.63995, acc@5: 99.16780
+[2025-06-03 16:40:24][DEBUG] [5060/5062] it/s: 201.79767, loss: 1.21945, acc@1: 89.60968, acc@5: 99.15761
+[2025-06-03 16:40:24][DEBUG] Train spent: 0:06:44.
+[2025-06-03 16:40:24][DEBUG] [1/2] loss: 0.23520, acc@1: 100.00000, acc@5: 100.00000
+[2025-06-03 16:40:24][DEBUG] [2/2] loss: 0.22702, acc@1: 100.00000, acc@5: 100.00000
+[2025-06-03 16:40:24][DEBUG] Test spent: 0:00:00.
+[2025-06-03 16:40:24][INFO] Test loss: 0.22702, Acc@1: 100.00000, Acc@5: 100.00000
+[2025-06-03 16:40:24][INFO]Epoch [11] Start, lr 0.000217
+[2025-06-03 16:41:46][DEBUG] [1012/5062] it/s: 197.80947, loss: 1.19631, acc@1: 89.62451, acc@5: 99.33918
+[2025-06-03 16:43:08][DEBUG] [2024/5062] it/s: 199.39687, loss: 1.19949, acc@1: 89.85610, acc@5: 99.28360
+[2025-06-03 16:44:30][DEBUG] [3036/5062] it/s: 199.09291, loss: 1.20633, acc@1: 89.71303, acc@5: 99.27742
+[2025-06-03 16:45:50][DEBUG] [4048/5062] it/s: 200.14510, loss: 1.20206, acc@1: 89.90396, acc@5: 99.30984
+[2025-06-03 16:47:11][DEBUG] [5060/5062] it/s: 200.57726, loss: 1.20124, acc@1: 89.93454, acc@5: 99.30459
+[2025-06-03 16:47:11][DEBUG] Train spent: 0:06:46.
+[2025-06-03 16:47:11][DEBUG] [1/2] loss: 0.20419, acc@1: 100.00000, acc@5: 100.00000
+[2025-06-03 16:47:11][DEBUG] [2/2] loss: 0.22070, acc@1: 100.00000, acc@5: 100.00000
+[2025-06-03 16:47:11][DEBUG] Test spent: 0:00:00.
+[2025-06-03 16:47:11][INFO] Test loss: 0.22070, Acc@1: 100.00000, Acc@5: 100.00000
+[2025-06-03 16:47:11][INFO]Epoch [12] Start, lr 0.000179
+[2025-06-03 16:48:32][DEBUG] [1012/5062] it/s: 201.56297, loss: 1.16545, acc@1: 90.97085, acc@5: 99.37624
+[2025-06-03 16:49:53][DEBUG] [2024/5062] it/s: 201.91589, loss: 1.17164, acc@1: 90.83807, acc@5: 99.34536
+[2025-06-03 16:51:13][DEBUG] [3036/5062] it/s: 202.59242, loss: 1.17356, acc@1: 90.75264, acc@5: 99.36388
+[2025-06-03 16:52:33][DEBUG] [4048/5062] it/s: 202.69040, loss: 1.17260, acc@1: 90.89365, acc@5: 99.34844
+[2025-06-03 16:53:53][DEBUG] [5060/5062] it/s: 203.02127, loss: 1.17259, acc@1: 90.91527, acc@5: 99.36512
+[2025-06-03 16:53:53][DEBUG] Train spent: 0:06:42.
+[2025-06-03 16:53:53][DEBUG] [1/2] loss: 0.19997, acc@1: 100.00000, acc@5: 100.00000
+[2025-06-03 16:53:53][DEBUG] [2/2] loss: 0.19667, acc@1: 100.00000, acc@5: 100.00000
+[2025-06-03 16:53:53][DEBUG] Test spent: 0:00:00.
+[2025-06-03 16:53:53][INFO] Test loss: 0.19667, Acc@1: 100.00000, Acc@5: 100.00000
+[2025-06-03 16:53:53][INFO]Epoch [13] Start, lr 0.000144
+[2025-06-03 16:55:13][DEBUG] [1012/5062] it/s: 203.22308, loss: 1.16596, acc@1: 91.19318, acc@5: 99.45652
+[2025-06-03 16:56:37][DEBUG] [2024/5062] it/s: 198.74518, loss: 1.16641, acc@1: 90.76087, acc@5: 99.41638
+[2025-06-03 16:57:58][DEBUG] [3036/5062] it/s: 199.59608, loss: 1.16448, acc@1: 91.02849, acc@5: 99.41329
+[2025-06-03 16:59:21][DEBUG] [4048/5062] it/s: 198.93143, loss: 1.16200, acc@1: 91.02489, acc@5: 99.42255
+[2025-06-03 17:00:42][DEBUG] [5060/5062] it/s: 199.18490, loss: 1.16454, acc@1: 90.80781, acc@5: 99.41329
+[2025-06-03 17:00:43][DEBUG] Train spent: 0:06:49.
+[2025-06-03 17:00:43][DEBUG] [1/2] loss: 0.20712, acc@1: 100.00000, acc@5: 100.00000
+[2025-06-03 17:00:43][DEBUG] [2/2] loss: 0.20670, acc@1: 100.00000, acc@5: 100.00000
+[2025-06-03 17:00:43][DEBUG] Test spent: 0:00:00.
+[2025-06-03 17:00:43][INFO] Test loss: 0.20670, Acc@1: 100.00000, Acc@5: 100.00000
+[2025-06-03 17:00:43][INFO]Epoch [14] Start, lr 0.000111
+[2025-06-03 17:02:04][DEBUG] [1012/5062] it/s: 201.49846, loss: 1.17807, acc@1: 90.06299, acc@5: 99.41947
+[2025-06-03 17:03:26][DEBUG] [2024/5062] it/s: 200.19174, loss: 1.16435, acc@1: 90.66206, acc@5: 99.50593
+[2025-06-03 17:04:48][DEBUG] [3036/5062] it/s: 199.87160, loss: 1.15943, acc@1: 90.83086, acc@5: 99.51622
+[2025-06-03 17:06:09][DEBUG] [4048/5062] it/s: 200.05987, loss: 1.16305, acc@1: 90.70837, acc@5: 99.50593
+[2025-06-03 17:07:30][DEBUG] [5060/5062] it/s: 200.29201, loss: 1.16195, acc@1: 90.64476, acc@5: 99.50222
+[2025-06-03 17:07:30][DEBUG] Train spent: 0:06:47.
+[2025-06-03 17:07:30][DEBUG] [1/2] loss: 0.21207, acc@1: 100.00000, acc@5: 100.00000
+[2025-06-03 17:07:30][DEBUG] [2/2] loss: 0.21300, acc@1: 100.00000, acc@5: 100.00000
+[2025-06-03 17:07:30][DEBUG] Test spent: 0:00:00.
+[2025-06-03 17:07:30][INFO] Test loss: 0.21300, Acc@1: 100.00000, Acc@5: 100.00000
+[2025-06-03 17:07:30][INFO]Epoch [15] Start, lr 0.000082
+[2025-06-03 17:08:53][DEBUG] [1012/5062] it/s: 196.15183, loss: 1.12888, acc@1: 91.75519, acc@5: 99.49358
+[2025-06-03 17:10:17][DEBUG] [2024/5062] it/s: 196.02815, loss: 1.13103, acc@1: 91.53594, acc@5: 99.50902
+[2025-06-03 17:11:38][DEBUG] [3036/5062] it/s: 197.70854, loss: 1.13754, acc@1: 91.41757, acc@5: 99.52857
+[2025-06-03 17:13:00][DEBUG] [4048/5062] it/s: 197.86940, loss: 1.13830, acc@1: 91.47264, acc@5: 99.51056
+[2025-06-03 17:14:21][DEBUG] [5060/5062] it/s: 198.41094, loss: 1.13843, acc@1: 91.50074, acc@5: 99.51705
+[2025-06-03 17:14:22][DEBUG] Train spent: 0:06:51.
+[2025-06-03 17:14:22][DEBUG] [1/2] loss: 0.24407, acc@1: 100.00000, acc@5: 100.00000
+[2025-06-03 17:14:22][DEBUG] [2/2] loss: 0.25126, acc@1: 100.00000, acc@5: 100.00000
+[2025-06-03 17:14:22][DEBUG] Test spent: 0:00:00.
+[2025-06-03 17:14:22][INFO] Test loss: 0.25126, Acc@1: 100.00000, Acc@5: 100.00000
+[2025-06-03 17:14:22][INFO]Epoch [16] Start, lr 0.000057
+[2025-06-03 17:15:40][DEBUG] [1012/5062] it/s: 208.46962, loss: 1.14050, acc@1: 91.38463, acc@5: 99.56151
+[2025-06-03 17:17:01][DEBUG] [2024/5062] it/s: 204.86680, loss: 1.13743, acc@1: 91.30435, acc@5: 99.55842
+[2025-06-03 17:18:23][DEBUG] [3036/5062] it/s: 203.06811, loss: 1.13841, acc@1: 91.18289, acc@5: 99.54093
+[2025-06-03 17:19:44][DEBUG] [4048/5062] it/s: 202.22424, loss: 1.13589, acc@1: 91.33060, acc@5: 99.55070
+[2025-06-03 17:21:06][DEBUG] [5060/5062] it/s: 201.70105, loss: 1.13688, acc@1: 91.30311, acc@5: 99.56769
+[2025-06-03 17:21:06][DEBUG] Train spent: 0:06:44.
+[2025-06-03 17:21:06][DEBUG] [1/2] loss: 0.30278, acc@1: 100.00000, acc@5: 100.00000
+[2025-06-03 17:21:06][DEBUG] [2/2] loss: 0.28284, acc@1: 100.00000, acc@5: 100.00000
+[2025-06-03 17:21:06][DEBUG] Test spent: 0:00:00.
+[2025-06-03 17:21:06][INFO] Test loss: 0.28284, Acc@1: 100.00000, Acc@5: 100.00000
+[2025-06-03 17:21:06][INFO]Epoch [17] Start, lr 0.000037
+[2025-06-03 17:22:24][DEBUG] [1012/5062] it/s: 208.98623, loss: 1.13520, acc@1: 91.07584, acc@5: 99.61092
+[2025-06-03 17:23:44][DEBUG] [2024/5062] it/s: 206.56102, loss: 1.13495, acc@1: 90.95541, acc@5: 99.60783
+[2025-06-03 17:25:05][DEBUG] [3036/5062] it/s: 205.23947, loss: 1.13374, acc@1: 91.15613, acc@5: 99.61504
+[2025-06-03 17:26:23][DEBUG] [4048/5062] it/s: 206.16681, loss: 1.12888, acc@1: 91.34604, acc@5: 99.60938
+[2025-06-03 17:27:44][DEBUG] [5060/5062] it/s: 204.95823, loss: 1.12837, acc@1: 91.46986, acc@5: 99.60968
+[2025-06-03 17:27:45][DEBUG] Train spent: 0:06:38.
+[2025-06-03 17:27:45][DEBUG] [1/2] loss: 0.23033, acc@1: 100.00000, acc@5: 100.00000
+[2025-06-03 17:27:45][DEBUG] [2/2] loss: 0.22803, acc@1: 100.00000, acc@5: 100.00000
+[2025-06-03 17:27:45][DEBUG] Test spent: 0:00:00.
+[2025-06-03 17:27:45][INFO] Test loss: 0.22803, Acc@1: 100.00000, Acc@5: 100.00000
+[2025-06-03 17:27:45][INFO]Epoch [18] Start, lr 0.000022
+[2025-06-03 17:29:05][DEBUG] [1012/5062] it/s: 202.32854, loss: 1.13449, acc@1: 91.56991, acc@5: 99.52446
+[2025-06-03 17:30:25][DEBUG] [2024/5062] it/s: 203.16794, loss: 1.12570, acc@1: 91.84165, acc@5: 99.55842
+[2025-06-03 17:31:47][DEBUG] [3036/5062] it/s: 202.28709, loss: 1.12597, acc@1: 91.64814, acc@5: 99.58004
+[2025-06-03 17:33:08][DEBUG] [4048/5062] it/s: 201.62395, loss: 1.13137, acc@1: 91.60233, acc@5: 99.59857
+[2025-06-03 17:34:31][DEBUG] [5060/5062] it/s: 200.86034, loss: 1.12810, acc@1: 91.67243, acc@5: 99.60968
+[2025-06-03 17:34:31][DEBUG] Train spent: 0:06:46.
+[2025-06-03 17:34:31][DEBUG] [1/2] loss: 0.23993, acc@1: 100.00000, acc@5: 100.00000
+[2025-06-03 17:34:31][DEBUG] [2/2] loss: 0.24170, acc@1: 100.00000, acc@5: 100.00000
+[2025-06-03 17:34:31][DEBUG] Test spent: 0:00:00.
+[2025-06-03 17:34:31][INFO] Test loss: 0.24170, Acc@1: 100.00000, Acc@5: 100.00000
+[2025-06-03 17:34:31][INFO]Epoch [19] Start, lr 0.000013
+[2025-06-03 17:35:52][DEBUG] [1012/5062] it/s: 200.53485, loss: 1.13697, acc@1: 91.75519, acc@5: 99.62945
+[2025-06-03 17:37:13][DEBUG] [2024/5062] it/s: 201.12571, loss: 1.12349, acc@1: 91.84165, acc@5: 99.63562
+[2025-06-03 17:38:34][DEBUG] [3036/5062] it/s: 201.26047, loss: 1.11822, acc@1: 91.98781, acc@5: 99.64797
+[2025-06-03 17:39:55][DEBUG] [4048/5062] it/s: 201.42105, loss: 1.11429, acc@1: 92.13655, acc@5: 99.65106
+[2025-06-03 17:41:16][DEBUG] [5060/5062] it/s: 201.49669, loss: 1.11552, acc@1: 92.09116, acc@5: 99.64303
+[2025-06-03 17:41:16][DEBUG] Train spent: 0:06:45.
+[2025-06-03 17:41:16][DEBUG] [1/2] loss: 0.29089, acc@1: 100.00000, acc@5: 100.00000
+[2025-06-03 17:41:16][DEBUG] [2/2] loss: 0.29560, acc@1: 100.00000, acc@5: 100.00000
+[2025-06-03 17:41:16][DEBUG] Test spent: 0:00:00.
+[2025-06-03 17:41:16][INFO] Test loss: 0.29560, Acc@1: 100.00000, Acc@5: 100.00000
+[2025-06-03 17:41:16][INFO]Training completed.
+/home/bcl_guest/SpikingResformer/main.py:901: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  checkpoint = torch.load(os.path.join(args.output_dir, 'checkpoint_max_acc1.pth'),
+[2025-06-03 17:41:17][INFO][Test]
+[2025-06-03 17:41:17][DEBUG]Test start
+[2025-06-03 17:41:17][DEBUG]Test: [1/2]
+[2025-06-03 17:41:18][DEBUG]Test: [2/2]
+[2025-06-03 17:41:18][INFO]Throughput: 47.41972 it/s
+[2025-06-03 17:41:18][INFO]Acc@1: 100.00000, Acc@5: 100.00000
+[2025-06-03 17:41:18][INFO]MACs: 1.22639 G, params: 10.80 M.
+[2025-06-03 17:41:18][INFO]Avg SOPs: 0.21966 G, Power: 0.19769 mJ.
+[2025-06-03 17:41:18][INFO]A/S Power Ratio: 28.536451
+[2025-06-03 17:41:18][INFO]All Done.
+
+real	136m2.915s
+user	194m46.001s
+sys	3m19.566s
+2025. 06. 03. (화) 17:41:19 KST
+
+

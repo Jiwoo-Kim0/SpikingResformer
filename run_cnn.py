@@ -1,6 +1,5 @@
-from IPython import get_ipython
-from IPython.display import display
-
+from datetime import datetime
+import logging
 import os
 import random
 import time
@@ -10,11 +9,19 @@ from torch import nn, optim
 from torch.utils.data import DataLoader
 from torchvision import datasets, models, transforms
 from timm.data import create_transform
+from timm.scheduler import create_scheduler_v2
 from tqdm import tqdm
-from matplotlib import pyplot as plt
 from torch.cuda.amp import autocast, GradScaler
+from types import SimpleNamespace
+import matplotlib.pyplot as plt
 
-
+# Set up logger
+logger = logging.getLogger("train_logger")
+logger.setLevel(logging.DEBUG)
+formatter = logging.Formatter("[%(asctime)s][%(levelname)s] %(message)s", "%Y-%m-%d %H:%M:%S")
+handler = logging.StreamHandler()
+handler.setFormatter(formatter)
+logger.handlers = [handler]
 
 # Reproducibility
 seed = 12450
@@ -25,8 +32,7 @@ np.random.seed(seed)
 torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = False
 
-# Device setup
-#os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
+# Device
 device = torch.device("cuda:3" if torch.cuda.is_available() else "cpu")
 
 # Hyperparameters
@@ -56,8 +62,8 @@ transform_val = transforms.Compose([
 ])
 
 # Dataset
-train_dataset = datasets.ImageFolder("./dataset/ASL/train", transform=transform_train)
-test_dataset = datasets.ImageFolder("./dataset/ASL/val_fixed", transform=transform_val)
+train_dataset = datasets.ImageFolder("/dev/hdd/bcl_guest/ASL/train", transform=transform_train)
+test_dataset = datasets.ImageFolder("/dev/hdd/bcl_guest/ASL/val_fixed", transform=transform_val)
 
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=16, pin_memory=True)
 test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=16, pin_memory=True)
@@ -85,15 +91,32 @@ def train_and_evaluate(model_name):
     criterion = nn.CrossEntropyLoss(label_smoothing=label_smoothing)
     optimizer = optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
 
-    train_losses = []
-    test_accuracies = []
+    args = SimpleNamespace(
+        epochs=epochs,
+        cooldown_epochs=10,
+        min_lr=1e-5,
+        warmup_lr=1e-5,
+        warmup_epochs=3
+    )
 
+    lr_scheduler, _ = create_scheduler_v2(
+        optimizer,
+        sched='cosine',
+        num_epochs=args.epochs,
+        cooldown_epochs=args.cooldown_epochs,
+        min_lr=args.min_lr,
+        warmup_lr=args.warmup_lr,
+        warmup_epochs=args.warmup_epochs,
+    )
+
+    logger.info(f"[Train]")
     for epoch in range(epochs):
         model.train()
+        logger.info(f"Epoch [{epoch}] Start, lr {optimizer.param_groups[0]['lr']:.6f}")
+        start_time = time.time()
         running_loss, correct_top1, correct_top5, total = 0.0, 0, 0, 0
-        progress_bar = tqdm(train_loader, desc=f"Epoch {epoch+1}/{epochs}")
 
-        for images, labels in progress_bar:
+        for idx, (images, labels) in enumerate(train_loader, 1):
             images, labels = images.to(device), labels.to(device)
             optimizer.zero_grad()
             with autocast():
@@ -101,6 +124,7 @@ def train_and_evaluate(model_name):
                 if isinstance(outputs, dict): outputs = outputs['logits']
                 if isinstance(outputs, tuple): outputs = outputs[0]
                 loss = criterion(outputs, labels)
+
             scaler.scale(loss).backward()
             scaler.step(optimizer)
             scaler.update()
@@ -112,20 +136,29 @@ def train_and_evaluate(model_name):
             correct_top5 += sum([labels[i] in pred_top5[i] for i in range(len(labels))])
             total += labels.size(0)
 
-        acc1 = 100 * correct_top1 / total
-        acc5 = 100 * correct_top5 / total
-        train_losses.append(running_loss / len(train_loader))
-        test_accuracies.append(acc1)
-        print(f"Train Acc@1: {acc1:.2f}%, Acc@5: {acc5:.2f}%")
+            if idx % max(1, len(train_loader) // 5) == 0:
+                it_per_s = idx / (time.time() - start_time)
+                acc1 = 100 * correct_top1 / total
+                acc5 = 100 * correct_top5 / total
+                logger.debug(f"[{idx}/{len(train_loader)}] it/s: {it_per_s:.5f}, loss: {loss.item():.5f}, acc@1: {acc1:.5f}, acc@5: {acc5:.5f}")
+
+        elapsed = time.time() - start_time
+        logger.debug(f"Train spent: {time.strftime('%H:%M:%S', time.gmtime(elapsed))}")
 
         model.eval()
-        correct_top1 = correct_top5 = total = 0
+        total, correct_top1, correct_top5 = 0, 0, 0
+        test_loss = 0.0
+        logger.debug("Test start")
+        start_test = time.time()
         with torch.no_grad():
-            for images, labels in test_loader:
+            for idx, (images, labels) in enumerate(test_loader, 1):
                 images, labels = images.to(device), labels.to(device)
                 outputs = model(images)
                 if isinstance(outputs, dict): outputs = outputs['logits']
                 if isinstance(outputs, tuple): outputs = outputs[0]
+
+                loss = criterion(outputs, labels)
+                test_loss += loss.item()
 
                 _, pred_top1 = outputs.topk(1, dim=1)
                 _, pred_top5 = outputs.topk(5, dim=1)
@@ -133,12 +166,21 @@ def train_and_evaluate(model_name):
                 correct_top5 += sum([labels[i] in pred_top5[i] for i in range(len(labels))])
                 total += labels.size(0)
 
+        elapsed_test = time.time() - start_test
         acc1 = 100 * correct_top1 / total
         acc5 = 100 * correct_top5 / total
-        print(f"Test Acc@1: {acc1:.2f}%, Acc@5: {acc5:.2f}%")
+        logger.info(f"Test loss: {test_loss/len(test_loader):.5f}, Acc@1: {acc1:.5f}, Acc@5: {acc5:.5f}")
 
-    results[model_name] = {
-        'loss': train_losses,
-        'accuracy': test_accuracies,
-        'final_accuracy': test_accuracies[-1]
-    }
+        if lr_scheduler is not None:
+            lr_scheduler.step(epoch + 1)
+
+    logger.info("Training completed.")
+
+def main():
+    for model_name in model_dict:
+        start = time.time()
+        train_and_evaluate(model_name)
+        print(f"{model_name} done in {time.time() - start:.1f}s\n")
+
+if __name__ == "__main__":
+    main()
